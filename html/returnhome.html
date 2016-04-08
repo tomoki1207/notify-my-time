@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="tomoki1207">
+  <style>
+    #time {
+      font-size: 200px;
+      font-weigth: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <p>今帰ると帰宅時間は<span id="time"></span>頃です。</p>
+  <script type="text/javascript">
+    // 通知の権限をもらう
+    if (Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
+
+    // 通勤にかかる時間
+    var hours = %%hour%%;
+    var minutes = %%min%%;
+    var n;
+    update();
+    setInterval(update, 60 * 1000);
+
+    function update() {
+      var dT = 60 * 60 * 1000 * hours + 60 * 1000 * minutes;
+      var timeObj = new Date(new Date().getTime() + dT);
+      var hour = timeObj.getHours();
+      var minute = timeObj.getMinutes();
+      hour = (10 <= hour) ? hour : "0" + hour;
+      minute = (10 <= minute) ? minute : "0" + minute;
+      var time = hour + ":" + minute;
+
+      if (n) {
+        n.close();
+      }
+
+      var options = {
+        body: "\n\n頃です。",
+        icon: generateIcon(time)
+      };
+      n = new Notification('今帰ると帰宅時間は', options);
+      document.querySelector("#time").textContent = time;
+      document.title = time;
+    }
+
+    // 時間アイコンを作成する
+    function generateIcon(time) {
+      var canvas = document.createElement('canvas');
+      canvas.width = 130;
+      canvas.height = 130;
+      var context = canvas.getContext('2d');
+      context.strokeStyle = '#3e3e3e';
+      context.strokeRect(5, 5, 120, 120);
+
+      // 文字関連
+      context.font = 'bold 80px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = '#000';
+      context.fillText(time, 64, 64, 110);
+      return canvas.toDataURL();
+    }
+  </script>
+</body>
+
+</html>
